@@ -1,0 +1,177 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+body {
+  overflow: hidden;
+  background-image: url(images/galaxybackground.jpg);
+  background-size: cover;
+
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  justify-content: center;
+}
+
+/* hide <start-btn>, <clock>, <body> with toggle js */
+.disabled {
+  width: 0;
+  overflow: hidden;
+}
+
+/* ------------------------------------ */
+/*          SABLIER - TIMMING           */
+/* ------------------------------------ */
+.clock {
+  position: absolute;
+  left: 50%;
+  top: 5%;
+  transform: translate(-50%, -50%);
+
+  color: whitesmoke;
+  font-size: 60px;
+  font-weight: 700;
+}
+
+/* ------------------------------------ */
+/*          BUTTON START GAME           */
+/* ------------------------------------ */
+aside {
+  align-self: center;
+}
+button {
+  cursor: pointer;
+
+  height: 120px;
+  width: 240px;
+
+  border: none;
+  border-radius: 9999px;
+
+  font-size: 40px;
+  font-weight: 800;
+  color: rgba(245, 245, 245, 0.35);
+
+  background: linear-gradient(
+    135deg,
+    rgba(237, 103, 22, 0.85),
+    rgba(91, 14, 94, 0.9)
+  );
+
+  filter: brightness(1.15);
+
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.45);
+}
+button:hover {
+  filter: brightness(1.4);
+  transform: scale(1.05);
+}
+
+/* ------------------------------------------------ */
+/*         MAIN (GRID - contains all tiles)         */
+/* ------------------------------------------------ */
+main {
+  align-self: center;
+
+  display: grid;
+  grid-template: var(--nbrRows) / var(--nbrColumns); /* Variables modifiées via javascript */
+
+  background: linear-gradient(
+    135deg,
+    rgba(237, 103, 22, 0.8),
+    rgba(91, 14, 94, 0.86)
+  );
+
+  box-shadow: 3px 3px 14px rgba(0, 0, 0, 0.6), -3px -3px 14px rgba(0, 0, 0, 0.6);
+}
+
+/* -------------------------- */
+/*           TILESET          */
+/* -------------------------- */
+.wall,
+.path,
+.T,
+.S {
+  border: solid 1px rgba(95, 95, 95, 0.4);
+}
+.wall {
+  /* = tiles that cannot be walking on */
+  background: rgba(10, 5, 15, 0.9);
+}
+.path {
+  /* = tiles we can walk on */
+  background: transparent;
+}
+.T {
+  /* T = Tresor = tile to reach for win */
+  background-image: url(images/artworks-000465508302-g4nkpf-t500x500.jpg);
+  background-size: cover;
+}
+.S {
+  /* S = Start = tile on which we start the level */
+  background: #570c51;
+}
+
+/* --------------------- */
+/*        PLAYER         */
+/* --------------------- */
+.player {
+  height: 59px;
+  width: 59px;
+
+  border-radius: 100%;
+
+  background-image: url(images/jord-removebg-preview2.png);
+  background-size: cover;
+
+  transform: scaleX(-1); /* Retourne l'image */
+}
+
+/* ---------------------------------------- */
+/*          WIN and VICTORY POPUPS          */
+/* ---------------------------------------- */
+.winPopUp {
+  z-index: 2;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  height: 220px;
+  width: 480px;
+  background: rgba(0, 0, 0, 0.8);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+
+  text-align: center;
+  color: rgba(245, 245, 245, 0.55);
+}
+.winPopUp p {
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 20px;
+}
+.winBtns {
+  display: flex;
+  justify-content: space-around;
+}
+.winBtns button {
+  font-size: 18px;
+  height: 50px;
+  margin-bottom: 6px;
+}
+.winBtns button:first-child {
+  width: 140px;
+  background: rgba(91, 14, 94, 0.6);
+}
+.winBtns button:last-child {
+  width: 135px;
+  background: rgba(237, 103, 22, 0.5);
+}
