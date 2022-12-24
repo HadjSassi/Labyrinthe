@@ -27,7 +27,7 @@ document.body.insertBefore(aside, document.body.children[0]);
 
 
 // levels list
-const LEVELS_LIST = [LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5];
+const LEVELS_LIST = [LEVEL_3];
 
 // Set current level number for get him in the [LEVELS_LIST] array
 let levelNumber = 0;
@@ -43,6 +43,7 @@ let levelNumber = 0;
 
 
 function levelGenerator(set, difficulty) {
+    randomizeBonusMalus();
 
     // ------ MODIFICATION VARIABLES CSS (GRID) --------
     leMain.style.setProperty('--nbrRows', `repeat(${LEVELS_LIST[levelNumber].length}, 60px)`);
@@ -51,7 +52,6 @@ function levelGenerator(set, difficulty) {
     // ------- TILESET CREATION -------
     let indexID = 1;
     for (let arr of LEVELS_LIST[levelNumber]) {
-
         for (let elem of arr) {
 
             let newSquare = document.createElement('section');
@@ -68,13 +68,13 @@ function levelGenerator(set, difficulty) {
             leMain.appendChild(newSquare);
         }
     }
-
+    // ------- Ennemy CREATION -------
+    let EnnemPos = document.querySelector('.E');
+    let enemy1 = document.createElement('section');
     // ------- PLAYER CREATION -------
     let startPos = document.querySelector('.S');
     let player1 = document.createElement('section');
 
-    let EnnemPos = document.querySelector('.E');
-    let enemy1 = document.createElement('section');
 
     let Golds = document.getElementsByClassName('G');
     let GoldsId = [];
@@ -96,7 +96,6 @@ function levelGenerator(set, difficulty) {
     for (let g = 0; g < Patri.length; g++) {
         PatriId.push(Patri[g].getAttribute('id'));
     }
-
     switch (difficulty) {
         case "Easy":
             PatriId = [];
@@ -133,7 +132,6 @@ function levelGenerator(set, difficulty) {
         let squareIdNumber = Number(player1.parentElement.getAttribute('id'));
         let squareUpId = squareIdNumber - LEVELS_LIST[levelNumber][0].length;
         let squareDownId = squareIdNumber + LEVELS_LIST[levelNumber][0].length;
-        // console.log(squareIdNumber, LEVELS_LIST[levelNumber][0].length,squareUpId , squareDownId)
         switch (e.key) {
             case 'ArrowUp':
                 if (document.getElementById(`${squareUpId}`).classList.contains('path')) {
@@ -167,7 +165,7 @@ function levelGenerator(set, difficulty) {
                 console.log(`Erreur: Touche ${e.key} non definie.`);
         }
         if (difficulty === 'Hard')
-            MoveEnnemie(enemy1,player1);
+            MoveEnnemie(enemy1, player1);
 
         // ------- Gold Event(Condition) --------
         if (GoldsId.includes(player1.parentElement.getAttribute('id'))) {
@@ -202,13 +200,14 @@ function levelGenerator(set, difficulty) {
             // clearInterval(intervalTimeGame);
 
             gamePopUp("GAME OVER",
-                `you failed level ${levelNumber + 1}`,
+                `you failed the level`,
                 `do you try again ?`,
                 `exit game`,
                 `try again`,
                 0,
+                difficulty,
                 resetGameTimer());
-
+            document.querySelector('.player').remove();
         }
 
         // ------- Chance Event(Condition) --------
@@ -242,27 +241,65 @@ function levelGenerator(set, difficulty) {
             removePopUp();
 
             if (levelNumber === (LEVELS_LIST.length - 1)) {
-                gamePopUp("VICTORY ! (Fin de la demo du jeu)",
-                    `well done you passed level ${levelNumber + 1} in ${14 - seconds}:${99 - tens} seconds`,
-                    `you completed the whole game in ${totalSeconds}:${totalTens} seconds`,
+                gamePopUp("VICTORY !",
+                    `well done you passed the level with ${score} score`,
+                    `you completed the whole game in Time`,
                     `exit game`,
                     `play again`,
                     0,
+                    difficulty,
                     resetGameTimer());
+                document.querySelector('.player').remove();
 
             } else {
-                gamePopUp(`well done you passed level ${levelNumber + 1} in ${14 - seconds}:${99 - tens} seconds`,
+                gamePopUp(`well done you passed level ${levelNumber + 1} in Time`,
                     "",
                     `ready for level ${levelNumber + 2} ?`,
                     `not today`,
                     `YES !`,
-                    levelNumber + 1);
+                    levelNumber + 1,
+                    difficulty,);
+                document.querySelector('.player').remove();
             }
 
         }
     })
 }
 
+function clearMaze() {
+    for (let i = 0; i < LEVELS_LIST[levelNumber].length; i++) {
+        for (let j = 0; j < LEVELS_LIST[levelNumber][i].length; j++) {
+            if (LEVELS_LIST[levelNumber][i][j] !== '*' && LEVELS_LIST[levelNumber][i][j] !== 'S' && LEVELS_LIST[levelNumber][i][j] !== 'E'&& LEVELS_LIST[levelNumber][i][j] !== 'T' ) {
+                LEVELS_LIST[levelNumber][i][j] = '.';
+            }
+        }
+    }
+}
+
+function randomizeBonusMalus() {
+    clearMaze();
+    paths = [];
+    let ii, xy;
+    let k = 1;
+    let symbols = ['G', 'H', 'L', 'P', 'G', 'H', 'L', 'P']
+    for (let i = 0; i < LEVELS_LIST[levelNumber].length; i++) {
+        for (let j = 0; j < LEVELS_LIST[levelNumber][i].length; j++) {
+            if (LEVELS_LIST[levelNumber][i][j] === '.') {
+                paths.push(k);
+            }
+            k++;
+        }
+    }
+    // LEVELS_LIST[levelNumber][3][5] = 'G';
+    for (let i = 0; i < 8; i++) {
+        ii = Math.floor(Math.random() * paths.length);
+        xy = getPosition(paths[ii]);
+        LEVELS_LIST[levelNumber][xy[0] - 1][xy[1] - 1] = symbols[i];
+        paths.splice(ii, 1);
+    }
+
+
+}
 
 function moveTowardsPlayer(monsterPos, playerPos) {
     const [monsterRow, monsterCol] = monsterPos;
@@ -281,35 +318,35 @@ function moveTowardsPlayer(monsterPos, playerPos) {
         // move towards player in the column direction
         newCol += colDiff > 0 ? 1 : -1;
     }
-    console.log(LEVELS_LIST[levelNumber][newRow-1][newCol-1])
     // check if the new position is a wall or not
-    if (LEVELS_LIST[levelNumber][newRow-1][newCol-1] === '*') {
-    // if it's a wall, we can't move there
+    if (LEVELS_LIST[levelNumber][newRow - 1][newCol - 1] === '*') {
+        // if it's a wall, we can't move there
         return monsterPos;
     } else {
-    // if it's not a wall, update the monster's position
+        // if it's not a wall, update the monster's position
         return [newRow, newCol];
     }
 }
 
-function getPosition(iddd){
-    let k = 1 ;
+function getPosition(iddd) {
+    let k = 1;
     idd = Number(iddd);
-    for(let i = 1 ; i <= LEVELS_LIST[levelNumber].length;i++){
-        for (let j =1 ; j <= LEVELS_LIST[levelNumber][0].length; j++){
-            if ( k === idd){
-                return[i,j];
+    for (let i = 1; i <= LEVELS_LIST[levelNumber].length; i++) {
+        for (let j = 1; j <= LEVELS_LIST[levelNumber][0].length; j++) {
+            if (k === idd) {
+                return [i, j];
             } else {
-                k++ ;
+                k++;
             }
         }
     }
 }
 
-function getIndex(xy){
-    return ((xy[0]-1)*LEVELS_LIST[levelNumber][0].length + xy[1]);
+function getIndex(xy) {
+    return ((xy[0] - 1) * LEVELS_LIST[levelNumber][0].length + xy[1]);
 }
-function MoveEnnemie(enemy1,player1) {
+
+function MoveEnnemie(enemy1, player1) {
     let xy = moveTowardsPlayer(
         getPosition(enemy1.parentElement.getAttribute('id')),
         getPosition(player1.parentElement.getAttribute('id'))
@@ -339,7 +376,7 @@ function exitLevel() {
 // ------------------------------------
 //        function GAME POPUP
 // ------------------------------------
-function gamePopUp(a, b, c, d, e, f, g) {
+function gamePopUp(a, b, c, d, e, f, g, h) {
 
     // Creation text du popup 
     const popupDivText = document.createElement('div');
@@ -382,7 +419,7 @@ function gamePopUp(a, b, c, d, e, f, g) {
 
         // Modify [levelNumber] before start new game or new level (f == 0 || f == levelNumber++)
         levelNumber = f;
-        levelGenerator(LEVELS_LIST[levelNumber]);
+        levelGenerator(LEVELS_LIST[levelNumber], g);
 
         g; // (g == rien || g == resetGameTimer())
         startGameTimer();

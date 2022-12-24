@@ -18,6 +18,7 @@ let clock = document.createElement('p');
 
 let seconds = 15;
 let tens = 0;
+let difficulty = "Easy"
 affichageSeconds.innerHTML = seconds;
 affichageTens.innerHTML = `0${tens}`;
 
@@ -63,11 +64,12 @@ function timer() {
         // clearInterval(intervalTimeGame);
 
         gamePopUp("GAME OVER",
-            `you failed level ${levelNumber + 1}`,
+            `you failed the level`,
             `do you try again ?`,
             `exit game`,
             `try again`,
             0,
+            difficulty,
             resetGameTimer());
         
         document.querySelector('.player').remove();
@@ -77,7 +79,7 @@ function timer() {
 function startTimerLevel() {
 
     // Reset timming before start new level
-    seconds = 150;
+    seconds = 15;
     tens = 0;
     affichageSeconds.innerHTML = seconds;
     affichageTens.innerHTML = `0${tens}`;

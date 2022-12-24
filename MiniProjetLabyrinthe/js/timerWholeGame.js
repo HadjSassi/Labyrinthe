@@ -25,4 +25,5 @@ function startGameTimer() {
 function resetGameTimer() {
     totalSeconds = 0;
     totalTens = 0;
+    score = 0 ;
 }
