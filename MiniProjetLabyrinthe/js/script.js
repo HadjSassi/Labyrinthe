@@ -15,11 +15,15 @@ playBtnMoyen.innerHTML = "Niveau Moyen"
 // Creation Play button Level Easy
 const playBtnHard = document.createElement('button');
 playBtnHard.innerHTML = "Niveau Difficile"
+// Creation Play button Level Easy
+const helpButton = document.createElement('button');
+helpButton.innerHTML = "Game Description"
 
 // Deplacement playBtn + clock dans <aside>
 aside.appendChild(playBtnEasy);
 aside.appendChild(playBtnMoyen);
 aside.appendChild(playBtnHard);
+aside.appendChild(helpButton);
 aside.appendChild(clock);
 
 // Deplacement <aside> dans <body>
@@ -408,6 +412,7 @@ function gamePopUp(a, b, c, d, e, f, g, h) {
         playBtnEasy.classList.toggle('disabled'); // Affiche: body
         playBtnMoyen.classList.toggle('disabled'); // Affiche: body
         playBtnHard.classList.toggle('disabled'); // Affiche: body
+        helpButton.classList.toggle('disabled'); // Affiche: body
         leMain.classList.toggle('disabled'); // Cache: body
     })
 
@@ -450,6 +455,7 @@ playBtnEasy.addEventListener('click', () => {
     playBtnEasy.classList.toggle('disabled'); // Cache: playBtn
     playBtnMoyen.classList.toggle('disabled'); // Cache: playBtn
     playBtnHard.classList.toggle('disabled'); // Cache: playBtn
+    helpButton.classList.toggle('disabled'); // Cache: playBtn
     clock.classList.toggle('disabled'); // Affiche: clock
     leMain.classList.toggle('disabled'); // Affiche: body
 
@@ -473,6 +479,7 @@ playBtnMoyen.addEventListener('click', () => {
     playBtnEasy.classList.toggle('disabled'); // Cache: playBtn
     playBtnMoyen.classList.toggle('disabled'); // Cache: playBtn
     playBtnHard.classList.toggle('disabled'); // Cache: playBtn
+    helpButton.classList.toggle('disabled'); // Cache: playBtn
     clock.classList.toggle('disabled'); // Affiche: clock
     leMain.classList.toggle('disabled'); // Affiche: body
 
@@ -496,6 +503,7 @@ playBtnHard.addEventListener('click', () => {
     playBtnEasy.classList.toggle('disabled'); // Cache: playBtn
     playBtnMoyen.classList.toggle('disabled'); // Cache: playBtn
     playBtnHard.classList.toggle('disabled'); // Cache: playBtn
+    helpButton.classList.toggle('disabled'); // Cache: playBtn
     clock.classList.toggle('disabled'); // Affiche: clock
     leMain.classList.toggle('disabled'); // Affiche: body
 
@@ -509,4 +517,15 @@ playBtnHard.addEventListener('click', () => {
     startGameTimer();
 
     startTimerLevel(); // (Le reset est comprit dans la function)
+});
+
+// ------- Game Description -------------
+helpButton.addEventListener('click',() => {
+    playBtnEasy.classList.toggle('disabled'); // Cache: playBtn
+    playBtnMoyen.classList.toggle('disabled'); // Cache: playBtn
+    playBtnHard.classList.toggle('disabled'); // Cache: playBtn
+    helpButton.classList.toggle('disabled'); // Cache: playBtn
+
+    location.href = './help.html';
+
 });
