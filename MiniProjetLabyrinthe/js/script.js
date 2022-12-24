@@ -5,11 +5,11 @@ const leMain = document.querySelector('main');
 const aside = document.createElement('aside');
 
 let score = 0;
-
+affichageScore.innerHTML = score;
 // Creation Play button Level Easy
 const playBtnEasy = document.createElement('button');
 playBtnEasy.innerHTML = "Niveau Facile"
-// Creation Play button Level Medius
+// Creation Play button Level medium
 const playBtnMoyen = document.createElement('button');
 playBtnMoyen.innerHTML = "Niveau Moyen"
 // Creation Play button Level Easy
@@ -71,8 +71,10 @@ function levelGenerator(set, difficulty) {
 
     // ------- PLAYER CREATION -------
     let startPos = document.querySelector('.S');
-
     let player1 = document.createElement('section');
+
+    let EnnemPos = document.querySelector('.E');
+    let enemy1 = document.createElement('section');
 
     let Golds = document.getElementsByClassName('G');
     let GoldsId = [];
@@ -94,14 +96,13 @@ function levelGenerator(set, difficulty) {
     for (let g = 0; g < Patri.length; g++) {
         PatriId.push(Patri[g].getAttribute('id'));
     }
-    let Ennem = document.getElementsByClassName('E');
-    let EnnemId = [];
-    for (let g = 0; g < Ennem.length; g++) {
-        EnnemId.push(Ennem[g].getAttribute('id'));
-    }
 
     switch (difficulty) {
         case "Easy":
+            PatriId = [];
+            LosesId = [];
+            TimesId = [];
+            GoldsId = [];
             while (document.getElementsByClassName('G').length) {
                 document.getElementsByClassName('G')[0].classList.remove("G");
             }
@@ -114,24 +115,16 @@ function levelGenerator(set, difficulty) {
             while (document.getElementsByClassName('P').length) {
                 document.getElementsByClassName('P')[0].classList.remove("P");
             }
-            while (document.getElementsByClassName('E').length) {
-                document.getElementsByClassName('E')[0].classList.remove("E");
-            }
             break;
         case "Moyen":
-            while (document.getElementsByClassName('E').length) {
-                document.getElementsByClassName('E')[0].classList.remove("E");
-            }
-            break;
-        case "Hard":
-            console.log("now ay");
             break;
     }
 
     player1.classList.add('player');
-
+    enemy1.classList.add('ennemy');
     startPos.appendChild(player1);
-
+    if (difficulty === 'Hard')
+        EnnemPos.appendChild(enemy1);
 
     // ------ KEYDOWN EVENT -------
     document.addEventListener('keydown', (e) => {
@@ -142,7 +135,6 @@ function levelGenerator(set, difficulty) {
         let squareDownId = squareIdNumber + LEVELS_LIST[levelNumber][0].length;
         // console.log(squareIdNumber, LEVELS_LIST[levelNumber][0].length,squareUpId , squareDownId)
         switch (e.key) {
-
             case 'ArrowUp':
                 if (document.getElementById(`${squareUpId}`).classList.contains('path')) {
 
@@ -174,39 +166,64 @@ function levelGenerator(set, difficulty) {
             default:
                 console.log(`Erreur: Touche ${e.key} non definie.`);
         }
+        if (difficulty === 'Hard')
+            MoveEnnemie(enemy1,player1);
 
         // ------- Gold Event(Condition) --------
         if (GoldsId.includes(player1.parentElement.getAttribute('id'))) {
             player1.parentElement.classList.remove("G");
-            GoldsId.splice(GoldsId.indexOf(player1.parentElement.getAttribute('id')),1);
+            GoldsId.splice(GoldsId.indexOf(player1.parentElement.getAttribute('id')), 1);
             score += 5;
+            affichageScore.innerHTML = score;
         }
 
         // ------- Time Event(Condition) --------
         if (TimesId.includes(player1.parentElement.getAttribute('id'))) {
             player1.parentElement.classList.remove("H");
-            TimesId.splice(TimesId.indexOf(player1.parentElement.getAttribute('id')),1);
+            TimesId.splice(TimesId.indexOf(player1.parentElement.getAttribute('id')), 1);
             seconds += 5;
         }
 
         // ------- Lose Event(Condition) --------
         if (LosesId.includes(player1.parentElement.getAttribute('id'))) {
             player1.parentElement.classList.remove("L");
-            LosesId.splice(LosesId.indexOf(player1.parentElement.getAttribute('id')),1);
+            LosesId.splice(LosesId.indexOf(player1.parentElement.getAttribute('id')), 1);
             score -= 3;
+            affichageScore.innerHTML = score;
+        }
+
+        // ------- Defeat Event(Condition) --------
+        if (difficulty === 'Hard' && player1.parentElement.getAttribute('id') === enemy1.parentElement.getAttribute('id')) {
+            tens = 0;
+            affichageTens.innerHTML = `0${tens}`;
+
+            clearInterval(intervalTimeLevel);
+
+            // clearInterval(intervalTimeGame);
+
+            gamePopUp("GAME OVER",
+                `you failed level ${levelNumber + 1}`,
+                `do you try again ?`,
+                `exit game`,
+                `try again`,
+                0,
+                resetGameTimer());
+
         }
 
         // ------- Chance Event(Condition) --------
         if (PatriId.includes(player1.parentElement.getAttribute('id'))) {
             player1.parentElement.classList.remove("P");
-            PatriId.splice(PatriId.indexOf(player1.parentElement.getAttribute('id')),1);
+            PatriId.splice(PatriId.indexOf(player1.parentElement.getAttribute('id')), 1);
             ii = Math.floor(Math.random() * 3);
             switch (ii) {
                 case 0 :
                     score += 3;
+                    affichageScore.innerHTML = score;
                     break;
                 case 1 :
                     score -= 3;
+                    affichageScore.innerHTML = score;
                     break;
                 case 2 :
                     startPos.appendChild(player1);
@@ -246,6 +263,60 @@ function levelGenerator(set, difficulty) {
     })
 }
 
+
+function moveTowardsPlayer(monsterPos, playerPos) {
+    const [monsterRow, monsterCol] = monsterPos;
+    const [playerRow, playerCol] = playerPos;
+
+    const rowDiff = playerRow - monsterRow;
+    const colDiff = playerCol - monsterCol;
+
+    let newRow = monsterRow;
+    let newCol = monsterCol;
+
+    if (Math.abs(rowDiff) > Math.abs(colDiff)) {
+        // move towards player in the row direction
+        newRow += rowDiff > 0 ? 1 : -1;
+    } else {
+        // move towards player in the column direction
+        newCol += colDiff > 0 ? 1 : -1;
+    }
+    console.log(LEVELS_LIST[levelNumber][newRow-1][newCol-1])
+    // check if the new position is a wall or not
+    if (LEVELS_LIST[levelNumber][newRow-1][newCol-1] === '*') {
+    // if it's a wall, we can't move there
+        return monsterPos;
+    } else {
+    // if it's not a wall, update the monster's position
+        return [newRow, newCol];
+    }
+}
+
+function getPosition(iddd){
+    let k = 1 ;
+    idd = Number(iddd);
+    for(let i = 1 ; i <= LEVELS_LIST[levelNumber].length;i++){
+        for (let j =1 ; j <= LEVELS_LIST[levelNumber][0].length; j++){
+            if ( k === idd){
+                return[i,j];
+            } else {
+                k++ ;
+            }
+        }
+    }
+}
+
+function getIndex(xy){
+    return ((xy[0]-1)*LEVELS_LIST[levelNumber][0].length + xy[1]);
+}
+function MoveEnnemie(enemy1,player1) {
+    let xy = moveTowardsPlayer(
+        getPosition(enemy1.parentElement.getAttribute('id')),
+        getPosition(player1.parentElement.getAttribute('id'))
+    );
+    let k = getIndex(xy);
+    document.getElementById(k).appendChild(enemy1);
+}
 
 //  ----- FUNCTION REMOVE POPUP : remove all <div> -----
 function removePopUp() {
@@ -337,7 +408,8 @@ function gamePopUp(a, b, c, d, e, f, g) {
 
 // ------- PLAYBTNEasy clickEvent -------
 playBtnEasy.addEventListener('click', () => {
-
+    score = 0;
+    affichageScore.innerHTML = score;
     playBtnEasy.classList.toggle('disabled'); // Cache: playBtn
     playBtnMoyen.classList.toggle('disabled'); // Cache: playBtn
     playBtnHard.classList.toggle('disabled'); // Cache: playBtn
@@ -359,7 +431,8 @@ playBtnEasy.addEventListener('click', () => {
 
 // ------- PLAYBTNMoyen clickEvent -------
 playBtnMoyen.addEventListener('click', () => {
-
+    score = 0;
+    affichageScore.innerHTML = score;
     playBtnEasy.classList.toggle('disabled'); // Cache: playBtn
     playBtnMoyen.classList.toggle('disabled'); // Cache: playBtn
     playBtnHard.classList.toggle('disabled'); // Cache: playBtn
@@ -381,7 +454,8 @@ playBtnMoyen.addEventListener('click', () => {
 
 // ------- PLAYBTNHard clickEvent -------
 playBtnHard.addEventListener('click', () => {
-
+    score = 0;
+    affichageScore.innerHTML = score;
     playBtnEasy.classList.toggle('disabled'); // Cache: playBtn
     playBtnMoyen.classList.toggle('disabled'); // Cache: playBtn
     playBtnHard.classList.toggle('disabled'); // Cache: playBtn

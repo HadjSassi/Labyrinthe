@@ -151,6 +151,10 @@ main {
 
 }
 .E {
+
+}
+.ennemy {
+  height: 55px;
   width: 55px;
 
   border-radius: 1%;
@@ -158,7 +162,7 @@ main {
   background-image: url(../images/plankton.png);
   background-size: cover;
 
-  transform: scaleX(1); /* Retourne l'image */
+  transform: scaleX(1);
 }
 .L {
   height: 55px;

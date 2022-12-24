@@ -2,13 +2,18 @@ let affichageSeconds = document.createElement('span');
 let affichageEspace = document.createElement('span');
 affichageEspace.innerHTML = ":";
 let affichageTens = document.createElement('span');
-
+let affichageEspaceS = document.createElement('span');
+affichageEspaceS.innerHTML = "  ";
+let affichageScore = document.createElement('span');
+affichageScore.innerHTML = 0 ;
 let clock = document.createElement('p');
     clock.classList.add('clock');
     clock.classList.add('disabled');
     clock.appendChild(affichageSeconds);
     clock.appendChild(affichageEspace);
     clock.appendChild(affichageTens);
+    clock.appendChild(affichageEspaceS);
+    clock.appendChild(affichageScore);
 
 
 let seconds = 15;
@@ -72,7 +77,7 @@ function timer() {
 function startTimerLevel() {
 
     // Reset timming before start new level
-    seconds = 15;
+    seconds = 150;
     tens = 0;
     affichageSeconds.innerHTML = seconds;
     affichageTens.innerHTML = `0${tens}`;
