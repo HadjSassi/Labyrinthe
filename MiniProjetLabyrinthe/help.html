@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Labyrinthe</title>
     <link rel="shortcut icon" href="images/gary.png" type="image/x-icon"/>
     <link rel="stylesheet" href="styles/style.css"/>
     <style type="text/css">
@@ -40,11 +41,12 @@
         <td class="tg-0lax">Try to run of the evil Plankton<br><img src="images/plankton.png" width="100"><br>Or you die<br>
         PS: you can trick the Plankton and run of it in the opposite way!, But it will follow you.</td>
     </tr>
+    <tr>
+            <button onclick="function clickInner(target) {location.href = target;} clickInner('index.html');">Play</button>
+
+    </tr>
     </tbody>
 </table>
-<button onclick="function clickInner(target) {
-    location.href = './index.html';
-}
-clickInner('index.html');">Go back to the game</button>
+
 </body>
 </html>

@@ -1,11 +1,7 @@
 // Selection <main>
 const leMain = document.querySelector('main');
-
 // Creation <aside>
 const aside = document.createElement('aside');
-
-let score = 0;
-affichageScore.innerHTML = score;
 // Creation Play button Level Easy
 const playBtnEasy = document.createElement('button');
 playBtnEasy.innerHTML = "Niveau Facile"
@@ -30,8 +26,8 @@ aside.appendChild(clock);
 document.body.insertBefore(aside, document.body.children[0]);
 
 
-// levels list
-const LEVELS_LIST = [LEVEL_3];
+// level call
+const LEVELS_LIST = [LEVEL];
 
 // Set current level number for get him in the [LEVELS_LIST] array
 let levelNumber = 0;
@@ -47,13 +43,16 @@ let levelNumber = 0;
 
 
 function levelGenerator(set, difficulty) {
+    // positionner les bonus et les malus aleatoirement dans le map
     randomizeBonusMalus();
 
     // ------ MODIFICATION VARIABLES CSS (GRID) --------
+    // affichage du map selon le nombre des cases du map
     leMain.style.setProperty('--nbrRows', `repeat(${LEVELS_LIST[levelNumber].length}, 60px)`);
     leMain.style.setProperty('--nbrColumns', `repeat(${LEVELS_LIST[levelNumber][0].length}, 60px)`);
 
     // ------- TILESET CREATION -------
+    // attribuer un id pour chaque element de la map et définir soit un mure soit une route
     let indexID = 1;
     for (let arr of LEVELS_LIST[levelNumber]) {
         for (let elem of arr) {
@@ -79,7 +78,7 @@ function levelGenerator(set, difficulty) {
     let startPos = document.querySelector('.S');
     let player1 = document.createElement('section');
 
-
+    // get the bonus mallus ids et les enregistrer dans une liste
     let Golds = document.getElementsByClassName('G');
     let GoldsId = [];
     for (let g = 0; g < Golds.length; g++) {
@@ -100,8 +99,8 @@ function levelGenerator(set, difficulty) {
     for (let g = 0; g < Patri.length; g++) {
         PatriId.push(Patri[g].getAttribute('id'));
     }
-    switch (difficulty) {
-        case "Easy":
+    // si difficulté alors on supprime les bonus et les mallus
+    if  (difficulty === "Easy") {
             PatriId = [];
             LosesId = [];
             TimesId = [];
@@ -118,13 +117,11 @@ function levelGenerator(set, difficulty) {
             while (document.getElementsByClassName('P').length) {
                 document.getElementsByClassName('P')[0].classList.remove("P");
             }
-            break;
-        case "Moyen":
-            break;
     }
-
+    // persnoalisatoin des charactéres
     player1.classList.add('player');
     enemy1.classList.add('ennemy');
+    // positionnement de l'avatar dans sa position et aussi l'enemy si le niveau difficile
     startPos.appendChild(player1);
     if (difficulty === 'Hard')
         EnnemPos.appendChild(enemy1);
@@ -168,9 +165,11 @@ function levelGenerator(set, difficulty) {
             default:
                 console.log(`Erreur: Touche ${e.key} non definie.`);
         }
+        // if the difficulty is hard then move the ennemy toward to player
         if (difficulty === 'Hard')
             MoveEnnemie(enemy1, player1);
 
+        // if the player cross a bonus or a malus then the item will disappear from the map and it does its affects
         // ------- Gold Event(Condition) --------
         if (GoldsId.includes(player1.parentElement.getAttribute('id'))) {
             player1.parentElement.classList.remove("G");
@@ -194,26 +193,6 @@ function levelGenerator(set, difficulty) {
             affichageScore.innerHTML = score;
         }
 
-        // ------- Defeat Event(Condition) --------
-        if (difficulty === 'Hard' && player1.parentElement.getAttribute('id') === enemy1.parentElement.getAttribute('id')) {
-            tens = 0;
-            affichageTens.innerHTML = `0${tens}`;
-
-            clearInterval(intervalTimeLevel);
-
-            // clearInterval(intervalTimeGame);
-
-            gamePopUp("GAME OVER",
-                `you failed the level`,
-                `do you try again ?`,
-                `exit game`,
-                `try again`,
-                0,
-                difficulty,
-                resetGameTimer());
-            document.querySelector('.player').remove();
-        }
-
         // ------- Chance Event(Condition) --------
         if (PatriId.includes(player1.parentElement.getAttribute('id'))) {
             player1.parentElement.classList.remove("P");
@@ -234,13 +213,33 @@ function levelGenerator(set, difficulty) {
             }
         }
 
+        // if the player cross the ennemy, time stops and the game ends
+        // ------- Defeat Event(Condition) --------
+        if (difficulty === 'Hard' && player1.parentElement.getAttribute('id') === enemy1.parentElement.getAttribute('id')) {
+            tens = 0;
+            affichageTens.innerHTML = `0${tens}`;
 
+            clearInterval(intervalTimeLevel);
+
+            // clearInterval(intervalTimeGame);
+
+            gamePopUp("GAME OVER",
+                `you failed the level`,
+                `do you try again ?`,
+                `exit game`,
+                `try again`,
+                0,
+                difficulty);
+            document.querySelector('.player').remove();
+        }
+
+
+
+        // if the player reach the gate, time stops and the game ends
         // ------- Win Event(Condition) --------
         if (player1.parentElement.getAttribute('id') === document.querySelector('.T').getAttribute('id')) {
 
             clearInterval(intervalTimeLevel);
-
-            clearInterval(intervalTimeGame);
 
             removePopUp();
 
@@ -251,25 +250,16 @@ function levelGenerator(set, difficulty) {
                     `exit game`,
                     `play again`,
                     0,
-                    difficulty,
-                    resetGameTimer());
+                    difficulty);
                 document.querySelector('.player').remove();
 
-            } else {
-                gamePopUp(`well done you passed level ${levelNumber + 1} in Time`,
-                    "",
-                    `ready for level ${levelNumber + 2} ?`,
-                    `not today`,
-                    `YES !`,
-                    levelNumber + 1,
-                    difficulty,);
-                document.querySelector('.player').remove();
             }
 
         }
     })
 }
 
+// this removes all the bonus mallus from the map
 function clearMaze() {
     for (let i = 0; i < LEVELS_LIST[levelNumber].length; i++) {
         for (let j = 0; j < LEVELS_LIST[levelNumber][i].length; j++) {
@@ -280,6 +270,7 @@ function clearMaze() {
     }
 }
 
+// this position the bonus and the mallus onver all the map randomly
 function randomizeBonusMalus() {
     clearMaze();
     paths = [];
@@ -305,6 +296,7 @@ function randomizeBonusMalus() {
 
 }
 
+// this is the algorithm for moving the enemy toward the player
 function moveTowardsPlayer(monsterPos, playerPos) {
     const [monsterRow, monsterCol] = monsterPos;
     const [playerRow, playerCol] = playerPos;
@@ -427,7 +419,6 @@ function gamePopUp(a, b, c, d, e, f, g, h) {
         levelGenerator(LEVELS_LIST[levelNumber], g);
 
         g; // (g == rien || g == resetGameTimer())
-        startGameTimer();
 
         startTimerLevel();
     })
@@ -463,10 +454,8 @@ playBtnEasy.addEventListener('click', () => {
     // Reset [levelNumber] before start new game
     levelNumber = 0;
     levelGenerator(LEVELS_LIST[levelNumber], "Easy");
-
+    difficulty = "Easy"
     // RESET and START gameTimming and levelTimming before start new game
-    resetGameTimer();
-    startGameTimer();
 
     startTimerLevel(); // (Le reset est comprit dans la function)
 });
@@ -487,10 +476,8 @@ playBtnMoyen.addEventListener('click', () => {
     // Reset [levelNumber] before start new game
     levelNumber = 0;
     levelGenerator(LEVELS_LIST[levelNumber], "Moyen");
-
+    difficulty = "Moyen"
     // RESET and START gameTimming and levelTimming before start new game
-    resetGameTimer();
-    startGameTimer();
 
     startTimerLevel(); // (Le reset est comprit dans la function)
 });
@@ -511,10 +498,8 @@ playBtnHard.addEventListener('click', () => {
     // Reset [levelNumber] before start new game
     levelNumber = 0;
     levelGenerator(LEVELS_LIST[levelNumber], "Hard");
-
+    difficulty = "Hard"
     // RESET and START gameTimming and levelTimming before start new game
-    resetGameTimer();
-    startGameTimer();
 
     startTimerLevel(); // (Le reset est comprit dans la function)
 });
