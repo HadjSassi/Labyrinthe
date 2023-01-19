@@ -77,6 +77,11 @@ function levelGenerator(set, difficulty) {
     // ------- PLAYER CREATION -------
     let startPos = document.querySelector('.S');
     let player1 = document.createElement('section');
+    // ------- ghost CREATION -------
+    let ghostPos = document.querySelector('.E');
+    // let ghostPos = document.querySelector('.j');
+    // console.log(ghostPos)
+    let ghost = document.createElement('section');
 
     // get the bonus mallus ids et les enregistrer dans une liste
     let Golds = document.getElementsByClassName('G');
@@ -117,14 +122,19 @@ function levelGenerator(set, difficulty) {
             while (document.getElementsByClassName('P').length) {
                 document.getElementsByClassName('P')[0].classList.remove("P");
             }
+    } else if (difficulty === "Moyen"){
+
     }
     // persnoalisatoin des charactéres
     player1.classList.add('player');
     enemy1.classList.add('ennemy');
+    ghost.classList.add('ghost')
     // positionnement de l'avatar dans sa position et aussi l'enemy si le niveau difficile
     startPos.appendChild(player1);
     if (difficulty === 'Hard')
         EnnemPos.appendChild(enemy1);
+    else if (difficulty ==='Moyen')
+        ghostPos.appendChild(ghost)
 
     // ------ KEYDOWN EVENT -------
     document.addEventListener('keydown', (e) => {
@@ -133,32 +143,44 @@ function levelGenerator(set, difficulty) {
         let squareIdNumber = Number(player1.parentElement.getAttribute('id'));
         let squareUpId = squareIdNumber - LEVELS_LIST[levelNumber][0].length;
         let squareDownId = squareIdNumber + LEVELS_LIST[levelNumber][0].length;
+        let squareIdNumberGhost;
+        let squareUpIdGhost;
+        let squareDownIdGhost;
+        if (difficulty === "Moyen" ) {
+            squareIdNumberGhost = Number(ghost.parentElement.getAttribute('id'));
+            squareUpIdGhost = squareIdNumberGhost - LEVELS_LIST[levelNumber][0].length;
+            squareDownIdGhost = squareIdNumberGhost + LEVELS_LIST[levelNumber][0].length;
+        }
         switch (e.key) {
             case 'ArrowUp':
                 if (document.getElementById(`${squareUpId}`).classList.contains('path')) {
-
                     document.getElementById(`${squareUpId}`).appendChild(player1);
+                    if(difficulty === "Moyen" && document.getElementById(`${squareDownIdGhost}`).classList.contains('path'))
+                        document.getElementById(`${squareDownIdGhost}`).appendChild(ghost);
                 }
                 break;
 
             case 'ArrowDown':
                 if (document.getElementById(`${squareDownId}`).classList.contains("path")) {
-
                     document.getElementById(`${squareDownId}`).appendChild(player1);
+                    if(difficulty === "Moyen" && document.getElementById(`${squareUpIdGhost}`).classList.contains('path'))
+                        document.getElementById(`${squareUpIdGhost}`).appendChild(ghost);
                 }
                 break;
 
             case 'ArrowLeft':
                 if (player1.parentElement.previousSibling.classList.contains("path")) {
-
                     player1.parentElement.previousSibling.appendChild(player1);
+                    if (difficulty === "Moyen" && ghost.parentElement.nextSibling.classList.contains("path"))
+                        ghost.parentElement.nextSibling.appendChild(ghost);
                 }
                 break;
 
             case 'ArrowRight':
                 if (player1.parentElement.nextSibling.classList.contains("path")) {
-
                     player1.parentElement.nextSibling.appendChild(player1);
+                    if (difficulty === "Moyen" && ghost.parentElement.previousSibling.classList.contains("path"))
+                        ghost.parentElement.previousSibling.appendChild(ghost);
                 }
                 break;
 
@@ -177,6 +199,10 @@ function levelGenerator(set, difficulty) {
             score += 5;
             affichageScore.innerHTML = score;
         }
+        if (difficulty === "Moyen" && GoldsId.includes(ghost.parentElement.getAttribute('id'))) {
+            ghost.parentElement.classList.remove("G");
+            GoldsId.splice(GoldsId.indexOf(ghost.parentElement.getAttribute('id')), 1);
+        }
 
         // ------- Time Event(Condition) --------
         if (TimesId.includes(player1.parentElement.getAttribute('id'))) {
@@ -184,6 +210,11 @@ function levelGenerator(set, difficulty) {
             TimesId.splice(TimesId.indexOf(player1.parentElement.getAttribute('id')), 1);
             seconds += 5;
         }
+         if (difficulty === "Moyen" && TimesId.includes(ghost.parentElement.getAttribute('id'))) {
+            ghost.parentElement.classList.remove("H");
+            TimesId.splice(TimesId.indexOf(ghost.parentElement.getAttribute('id')), 1);
+        }
+
 
         // ------- Lose Event(Condition) --------
         if (LosesId.includes(player1.parentElement.getAttribute('id'))) {
@@ -191,6 +222,10 @@ function levelGenerator(set, difficulty) {
             LosesId.splice(LosesId.indexOf(player1.parentElement.getAttribute('id')), 1);
             score -= 3;
             affichageScore.innerHTML = score;
+        }
+        if (difficulty === "Moyen" && LosesId.includes(ghost.parentElement.getAttribute('id'))) {
+            ghost.parentElement.classList.remove("L");
+            LosesId.splice(LosesId.indexOf(ghost.parentElement.getAttribute('id')), 1);
         }
 
         // ------- Chance Event(Condition) --------
@@ -211,6 +246,10 @@ function levelGenerator(set, difficulty) {
                     startPos.appendChild(player1);
                     break;
             }
+        }
+        if (difficulty === "Moyen" && PatriId.includes(ghost.parentElement.getAttribute('id'))) {
+            ghost.parentElement.classList.remove("P");
+            PatriId.splice(PatriId.indexOf(ghost.parentElement.getAttribute('id')), 1);
         }
 
         // if the player cross the ennemy, time stops and the game ends

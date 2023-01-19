@@ -115,6 +115,11 @@ main {
   background: rgba(204, 73, 0, 0.9);
 }
 
+.j {
+  /* S = Start = tile on which we start the level */
+  background: rgba(232, 134, 75, 0.9);
+}
+
 /* --------------------- */
 /*        PLAYER         */
 /* --------------------- */
@@ -128,6 +133,18 @@ main {
   background-size: cover;
 
   transform: scaleX(1); /* Retourne l'image */
+}
+
+.ghost {
+  height: 55px;
+  width: 55px;
+
+  border-radius: 1%;
+
+  background-image: url(../images/ghost.png);
+  background-size: cover;
+
+  transform: scaleX(-1); /* Retourne l'image */
 }
 
 .G {
@@ -153,6 +170,7 @@ main {
 .E {
 
 }
+
 .ennemy {
   height: 55px;
   width: 55px;
